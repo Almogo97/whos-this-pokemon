@@ -8,7 +8,7 @@ repository = "https://github.com/Almogo97/whos-this-pokemon"
 readme = "README.md"
 keywords = ["pokemon", "game", "guess"]
 categories = ["games"]
-license = "gpl-3.0"
+license = "MIT"
 
 [dependencies]
 rand = "0.8.5"
