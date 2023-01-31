@@ -1,9 +1,14 @@
 [package]
-name = "whos_this_pokemon"
+name = "whos-this-pokemon"
 version = "0.1.0"
+author = ["Álvaro <amoratogorriz@gmail.com>"]
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "Terminal game where the player has to guess the Pokemon given it's Pokedex entry."
+repository = "https://github.com/Almogo97/whos-this-pokemon"
+readme = "README.md"
+keywords = ["pokemon", "game", "guess"]
+categories = ["games"]
+license = "gpl-3.0"
 
 [dependencies]
 rand = "0.8.5"

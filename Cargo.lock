@@ -982,7 +982,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "whos_this_pokemon"
+name = "whos-this-pokemon"
 version = "0.1.0"
 dependencies = [
  "rand",
