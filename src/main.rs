@@ -50,7 +50,10 @@ async fn main() -> Result<(), Error> {
 
     let mut rng = rand::thread_rng();
 
-    let url = format!("https://pokeapi.co/api/v2/pokemon-species/{}", "poliwrath");
+    let url = format!(
+        "https://pokeapi.co/api/v2/pokemon-species/{}",
+        rng.gen_range(1..152)
+    );
     let response = reqwest::get(url).await?;
 
     let pokemon_serialized = response.json::<PokemonSpeciesResponse>().await?;
