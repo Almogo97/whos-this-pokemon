@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'whos_this_pokemon'",
+            "name": "Debug executable 'whos-this-pokemon'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=whos_this_pokemon",
-                    "--package=whos_this_pokemon"
+                    "--bin=whos-this-pokemon",
+                    "--package=whos-this-pokemon"
                 ],
                 "filter": {
-                    "name": "whos_this_pokemon",
+                    "name": "whos-this-pokemon",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'whos_this_pokemon'",
+            "name": "Debug unit tests in executable 'whos-this-pokemon'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=whos_this_pokemon",
-                    "--package=whos_this_pokemon"
+                    "--bin=whos-this-pokemon",
+                    "--package=whos-this-pokemon"
                 ],
                 "filter": {
-                    "name": "whos_this_pokemon",
+                    "name": "whos-this-pokemon",
                     "kind": "bin"
                 }
             },
