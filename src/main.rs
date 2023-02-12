@@ -1,7 +1,14 @@
 use std::io;
 
+use clap::Parser;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long)]
+    language: Option<String>,
+}
 
 #[derive(Serialize, Deserialize)]
 struct MyConfig {
@@ -68,7 +75,12 @@ struct Pokemon {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let cfg = confy::load::<MyConfig>("whos-this-pokemon", None)?;
+    let mut cfg = confy::load::<MyConfig>("whos-this-pokemon", None)?;
+
+    let args = Args::parse();
+    if let Some(language) = args.language {
+        cfg.language = language
+    }
 
     println!("Welcome to the guess the Pokemon game! Guess the pokemon according to it's pokedex description");
     println!("You're playing with gen 1 Pokedex descriptions.\n");
