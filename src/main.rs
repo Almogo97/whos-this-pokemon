@@ -10,6 +10,9 @@ struct Args {
     language: Option<String>,
     #[arg(short, long)]
     version: Option<String>,
+    /// Updates the configuration values in disk to be the ones used in this call
+    #[arg(short, long)]
+    save: bool,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -77,7 +80,9 @@ struct Pokemon {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut cfg = confy::load::<MyConfig>("whos-this-pokemon", None)?;
+    const APP_NAME: &str = "whos-this-pokemon";
+    let mut cfg = confy::load::<MyConfig>(APP_NAME, None)?;
+    println!("{:?}", confy::get_configuration_file_path(APP_NAME, None)?);
 
     let args = Args::parse();
     if let Some(language) = args.language {
@@ -85,6 +90,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     if let Some(version) = args.version {
         cfg.version = version
+    }
+    if args.save {
+        confy::store(APP_NAME, None, &cfg)?;
     }
 
     println!("Welcome to the guess the Pokemon game! Guess the pokemon according to it's pokedex description");
