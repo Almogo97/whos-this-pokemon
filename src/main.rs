@@ -1,8 +1,39 @@
 use std::io;
 
+use clap::Parser;
 use rand::Rng;
-use reqwest::Error;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long)]
+    language: Option<String>,
+    #[arg(short, long)]
+    version: Option<String>,
+    /// Updates the configuration values in disk to be the ones used in this call
+    #[arg(short, long)]
+    save: bool,
+    /// Use together with --save when you only want to change the config but not play the game
+    #[arg(short, long)]
+    no_play: bool,
+}
+
+#[derive(Serialize, Deserialize)]
+struct MyConfig {
+    version: String,
+    language: String,
+    generation: u8,
+}
+
+impl Default for MyConfig {
+    fn default() -> Self {
+        Self {
+            version: "x".into(),
+            language: "en".into(),
+            generation: 4,
+        }
+    }
+}
 
 #[derive(Deserialize)]
 struct Language {
@@ -51,100 +82,26 @@ struct Pokemon {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Error> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    const APP_NAME: &str = "whos-this-pokemon";
+    let mut cfg = confy::load::<MyConfig>(APP_NAME, None)?;
+
+    let args = Args::parse();
+    if let Some(language) = args.language {
+        cfg.language = language
+    }
+    if let Some(version) = args.version {
+        cfg.version = version
+    }
+    if args.save {
+        confy::store(APP_NAME, None, &cfg)?;
+    }
+    if args.no_play {
+        return Ok(());
+    }
+
     println!("Welcome to the guess the Pokemon game! Guess the pokemon according to it's pokedex description");
     println!("You're playing with gen 1 Pokedex descriptions.\n");
-
-    // Select language
-    println!("What language do you want to play in?");
-    let available_languages = [
-        "ja-Hrkt", "roomaji", "ko", "zh-Hant", "fr", "de", "es", "it", "en", "cs", "ja", "zh-Hans",
-        "pt-BR",
-    ];
-
-    let game_language;
-
-    loop {
-        let mut input = String::new();
-        let stdin = io::stdin();
-        stdin.read_line(&mut input).unwrap();
-        let trim_input = input.trim();
-
-        if available_languages.contains(&trim_input) {
-            game_language = trim_input.to_owned();
-            break;
-        } else {
-            println!(
-                "Language not recognized. Please choose one of the following languages: {:?}",
-                available_languages
-            );
-        }
-    }
-
-    // Select language
-    println!("What generation do you want to play with?");
-    let available_versions = [
-        "red",
-        "blue",
-        "yellow",
-        "gold",
-        "silver",
-        "crystal",
-        "ruby",
-        "sapphire",
-        "emerald",
-        "firered",
-        "leafgreen",
-        "diamonnd",
-        "pearl",
-        "platinum",
-        "heartgold",
-        "soulsilver",
-        "black",
-        "white",
-        "colosseum",
-        "xd",
-        "black-2",
-        "white-2",
-        "x",
-        "y",
-        "omega-ruby",
-        "alpha-sapphire",
-        "sun",
-        "moon",
-        "ultra-sun",
-        "ultra-moon",
-        "lets-go-pikachu",
-        "lets-go-eevee",
-        "sword",
-        "shield",
-        "the-isle-of-armor",
-        "the-crown-tundra",
-        "brilliant-diamond",
-        "shining-pearl",
-        "legends-arceus",
-        "scarlet",
-        "violet",
-    ];
-
-    let game_version;
-
-    loop {
-        let mut input = String::new();
-        let stdin = io::stdin();
-        stdin.read_line(&mut input).unwrap();
-        let trim_input = input.trim();
-
-        if available_versions.contains(&trim_input) {
-            game_version = trim_input.to_owned();
-            break;
-        } else {
-            println!(
-                "Version not recognized. Please choose one of the following languages: {:?}",
-                available_versions
-            );
-        }
-    }
 
     let mut rng = rand::thread_rng();
 
@@ -155,7 +112,7 @@ async fn main() -> Result<(), Error> {
     let response = reqwest::get(url).await?;
 
     let pokemon_serialized = response.json::<PokemonSpeciesResponse>().await?;
-    let pokemon = pokemon_serialized.to_pokemon(&game_language, &game_version);
+    let pokemon = pokemon_serialized.to_pokemon(&cfg.language, &cfg.version);
     println!("{}", pokemon.description);
 
     let mut input = String::new();
