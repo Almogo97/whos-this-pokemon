@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 struct Args {
     #[arg(short, long)]
     language: Option<String>,
+    #[arg(short, long)]
+    version: Option<String>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -80,6 +82,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     if let Some(language) = args.language {
         cfg.language = language
+    }
+    if let Some(version) = args.version {
+        cfg.version = version
     }
 
     println!("Welcome to the guess the Pokemon game! Guess the pokemon according to it's pokedex description");
