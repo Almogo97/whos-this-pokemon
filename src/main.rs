@@ -13,6 +13,9 @@ struct Args {
     /// Updates the configuration values in disk to be the ones used in this call
     #[arg(short, long)]
     save: bool,
+    /// Use together with --save when you only want to change the config but not play the game
+    #[arg(short, long)]
+    no_play: bool,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -82,7 +85,6 @@ struct Pokemon {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     const APP_NAME: &str = "whos-this-pokemon";
     let mut cfg = confy::load::<MyConfig>(APP_NAME, None)?;
-    println!("{:?}", confy::get_configuration_file_path(APP_NAME, None)?);
 
     let args = Args::parse();
     if let Some(language) = args.language {
@@ -93,6 +95,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     if args.save {
         confy::store(APP_NAME, None, &cfg)?;
+    }
+    if args.no_play {
+        return Ok(());
     }
 
     println!("Welcome to the guess the Pokemon game! Guess the pokemon according to it's pokedex description");
