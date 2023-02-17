@@ -10,6 +10,8 @@ struct Args {
     language: Option<String>,
     #[arg(short, long)]
     version: Option<String>,
+    #[arg(short, long)]
+    generation: Option<usize>,
     /// Updates the configuration values in disk to be the ones used in this call
     #[arg(short, long)]
     save: bool,
@@ -22,7 +24,7 @@ struct Args {
 struct MyConfig {
     version: String,
     language: String,
-    generation: u8,
+    generation: usize,
 }
 
 impl Default for MyConfig {
@@ -84,6 +86,8 @@ struct Pokemon {
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     const APP_NAME: &str = "whos-this-pokemon";
+    const POKEMON_IN_GENERATION: [u16; 9] = [151, 251, 386, 493, 649, 721, 809, 905, 1008];
+
     let mut cfg = confy::load::<MyConfig>(APP_NAME, None)?;
 
     let args = Args::parse();
@@ -93,6 +97,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(version) = args.version {
         cfg.version = version
     }
+    if let Some(generation) = args.generation {
+        cfg.generation = generation
+    }
     if args.save {
         confy::store(APP_NAME, None, &cfg)?;
     }
@@ -101,13 +108,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     println!("Welcome to the guess the Pokemon game! Guess the pokemon according to it's pokedex description");
-    println!("You're playing with gen 1 Pokedex descriptions.\n");
+    println!(
+        "You're playing with gen {} Pokedex descriptions.\n",
+        cfg.generation
+    );
 
     let mut rng = rand::thread_rng();
 
     let url = format!(
         "https://pokeapi.co/api/v2/pokemon-species/{}",
-        rng.gen_range(1..152)
+        rng.gen_range(1..POKEMON_IN_GENERATION[cfg.generation - 1])
     );
     let response = reqwest::get(url).await?;
 
