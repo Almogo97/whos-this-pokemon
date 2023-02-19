@@ -1,6 +1,6 @@
 [package]
 name = "whos-this-pokemon"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Álvaro <amoratogorriz@gmail.com>"]
 edition = "2021"
 description = "Terminal game where the player has to guess the Pokemon given it's Pokedex entry."
